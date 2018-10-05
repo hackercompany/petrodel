@@ -252,6 +252,8 @@ class OrderManagement(APIView):
             resp['amount'] = order.amount
             resp['status'] = order.status
             resp['address'] = order.address
+            resp['latitude'] = order.latitude
+            resp['longitude'] = order.longitude
             resp['created_at'] = order.created_at.date()
             resp['channel_partner'] = order.channel_partner.name
             resp['channel_partner_latitude'] = order.channel_partner.latitude
@@ -284,6 +286,8 @@ class UserOrders(APIView):
                 data['amount'] = order.amount
                 data['status'] = order.status
                 data['address'] = order.address
+                data['latitude'] = order.latitude
+                data['longitude'] = order.longitude
                 data['created_at'] = order.created_at.date()
                 data['channel_partner'] = order.channel_partner.name
                 data['channel_partner_latitude'] = order.channel_partner.latitude
