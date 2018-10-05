@@ -186,7 +186,7 @@ class ChannelPartnerOrder(APIView):
         longitude = request.data.get('longitude')
         rate = 79.72
         amount = quantity * rate
-        status = 'pending'
+        status = 'ODR_PL'
         created_at = datetime.now()
         channel_partner = ChannelPartner.objects.all().first()
         if amount > 0:
@@ -225,7 +225,7 @@ class OrderManagement(APIView):
         longitude = request.data.get('longitude')
         rate = 79.72
         amount = quantity * rate
-        status = 'pending'
+        status = 'ODR_PL'
         created_at = datetime.now()
         channel_partner = ChannelPartner.objects.all().first()
         if amount > 0:
