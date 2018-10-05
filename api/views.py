@@ -211,7 +211,12 @@ class OrderManagement(APIView):
 
     def post(self, request):
         resp = {'status': 'failed'}
-        user = request.data.get('username')
+        username = request.data.get('username')
+        user = Users.objects.filter(username=username)
+        if not user:
+            resp['reason'] = 'User Not Found'
+            return Response(resp, status=403)
+        user = user[0]
         order_id = self.m.get_txn_id()
         product_type = request.data.get('p_type')
         address = request.data.get('address')
