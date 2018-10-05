@@ -3,11 +3,13 @@ from rest_framework.response import Response
 from models import *
 from methods import Methods
 from datetime import datetime
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 
 
 class ChannelPartnerRegistration(APIView):
+    @csrf_exempt
     def post(self, request):
         resp = {'status': 'failed'}
         user = request.data.get('username')
@@ -23,6 +25,7 @@ class ChannelPartnerRegistration(APIView):
 
 
 class Register(APIView):
+    @csrf_exempt
     def post(self, request):
         resp = {'status': 'failed'}
         username = request.data.get('username')
@@ -34,7 +37,38 @@ class Register(APIView):
         return Response(resp, status=201)
 
 
+class PartnerOrderAction(APIView):
+    @csrf_exempt
+    def post(self, request):
+        resp = {'status': 'failed'}
+        action_type = request.data.get('action_type')
+        order_id = request.data.get('order_id')
+        o = Order.objects.filter(order_id=order_id)
+        if o:
+            o = o[0]
+            if action_type == "accept":
+                o.status = "ODR_PL"
+                o.save()
+                resp['status'] = 'success'
+            elif action_type == "ass_driver":
+                driver_name = request.data.get('driver_name')
+                driver = Driver.objects.filter(name=driver_name)
+                if driver:
+                    driver = driver[0]
+                    o.driver = driver
+                    o.status = "ARR_PP"
+                    o.save()
+                    resp['status'] = 'success'
+        return Response(resp, status=200)
+
+
+class PartnerDriverAction(APIView):
+    def post(self, request):
+        resp = {'status': 'failed'}
+
+
 class DriverManagement(APIView):
+    @csrf_exempt
     def post(self, request):
         resp = {'status': 'failed'}
         name = request.data.get('name')
@@ -46,6 +80,7 @@ class DriverManagement(APIView):
         resp['status'] = 'success'
         return Response(resp, status=201)
 
+    @csrf_exempt
     def get(self, request):
         resp = {'status': 'failed'}
         resp['data'] = []
@@ -63,6 +98,7 @@ class DriverManagement(APIView):
 
 
 class VehicleManagement(APIView):
+    @csrf_exempt
     def post(self, request):
         resp = {'status': 'failed'}
         channel_partner_username = request.data.get('channel_partner')
@@ -80,6 +116,7 @@ class VehicleManagement(APIView):
             resp['status'] = 'success'
         return Response(resp, status=201)
 
+    @csrf_exempt
     def get(self, request):
         resp = {'status': 'failed'}
         cp_name = request.GET.get('channel_partner')
@@ -104,6 +141,7 @@ class VehicleManagement(APIView):
 
 
 class AssetManagement(APIView):
+    @csrf_exempt
     def post(self, request):
         resp = {'status': 'failed'}
         username = request.data.get('username')
@@ -116,6 +154,7 @@ class AssetManagement(APIView):
             resp['status'] = 'success'
         return Response(resp, status=201)
 
+    @csrf_exempt
     def get(self, request):
         resp = {'status': 'failed'}
         username = request.GET.get('username')
@@ -137,6 +176,7 @@ class ChannelPartnerOrder(APIView):
     def __init__(self):
         self.m = Methods()
 
+    @csrf_exempt
     def get(self, request):
         resp = {'status': 'failed'}
         username = request.GET.get('channel_partner')
@@ -155,7 +195,7 @@ class ChannelPartnerOrder(APIView):
             for order in orders:
                 data = {}
                 data['order_id'] = order.order_id
-                data['username'] = order.user
+                data['username'] = order.user.name
                 data['p_type'] = order.product
                 data['quantity'] = order.quantity
                 data['rate'] = order.rate
@@ -174,6 +214,7 @@ class ChannelPartnerOrder(APIView):
                 resp['meta']['online_gmv'] = resp['meta']['gmv']
         return Response(resp, status=200)
 
+    @csrf_exempt
     def post(self, request):
         resp = {'status': 'failed'}
         username = request.data.get('username')
@@ -209,6 +250,7 @@ class OrderManagement(APIView):
     def __init__(self):
         self.m = Methods()
 
+    @csrf_exempt
     def post(self, request):
         resp = {'status': 'failed'}
         username = request.data.get('username')
@@ -243,6 +285,7 @@ class OrderManagement(APIView):
             resp['channel_partner'] = channel_partner.name
         return Response(resp, status=200)
 
+    @csrf_exempt
     def get(self, request):
         resp = {'status': 'failed'}
         order_id = request.GET.get('order_id')
@@ -271,6 +314,7 @@ class OrderManagement(APIView):
 
 
 class UserOrders(APIView):
+    @csrf_exempt
     def get(self, request):
         resp = {'status': 'failed'}
         user = Users.objects.filter(username=request.GET.get('username'))
