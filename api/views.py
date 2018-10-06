@@ -21,7 +21,18 @@ class ChannelPartnerRegistration(APIView):
                            latitude=latitude, longitude=longitude)
         c.save()
         resp['status'] = 'success'
-        return Response(resp, status=201)
+        return Response(resp, status=200)
+
+
+class UserLogin(APIView):
+    def post(self, request):
+        resp = {'status': 'failed'}
+        username = request.data.get('username')
+        password = request.data.get('password')
+        user = Users.objects.filter(username=username, password=password)
+        if user:
+            resp['status'] = 'success'
+        return Response(resp, status=200)
 
 
 class Register(APIView):
@@ -34,7 +45,7 @@ class Register(APIView):
         u = Users(username=username, password=password, name=name)
         u.save()
         resp['status'] = 'success'
-        return Response(resp, status=201)
+        return Response(resp, status=200)
 
 
 class PartnerOrderAction(APIView):
@@ -150,7 +161,7 @@ class DriverManagement(APIView):
                    vehical=vehical)
         d.save()
         resp['status'] = 'success'
-        return Response(resp, status=201)
+        return Response(resp, status=200)
 
     @csrf_exempt
     def get(self, request):
@@ -186,7 +197,7 @@ class VehicleManagement(APIView):
                                status="active")
             vehical.save()
             resp['status'] = 'success'
-        return Response(resp, status=201)
+        return Response(resp, status=200)
 
     @csrf_exempt
     def get(self, request):
@@ -224,7 +235,7 @@ class AssetManagement(APIView):
             asset = UserAssets(user=user, name=asset_name)
             asset.save()
             resp['status'] = 'success'
-        return Response(resp, status=201)
+        return Response(resp, status=200)
 
     @csrf_exempt
     def get(self, request):

@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^partner/register', views.ChannelPartnerRegistration.as_view()),
     url(r'^partner/order', views.ChannelPartnerOrder.as_view()),
     url(r'^user/register', views.Register.as_view()),
+    url(r'^user/login', views.UserLogin.as_view()),
     url(r'^user/order', views.UserOrders.as_view()),
     url(r'^driver/order', views.DriverOrderManagement.as_view()),
     url(r'^driver/', views.DriverManagement.as_view()),
