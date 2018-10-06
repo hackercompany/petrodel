@@ -43,11 +43,11 @@ class PartnerOrderAction(APIView):
         resp = {'status': 'failed'}
         action_type = request.data.get('action_type')
         order_id = request.data.get('order_id')
-        o = Order.objects.filter(order_id=order_id)
+        o = Orders.objects.filter(order_id=order_id)
         if o:
             o = o[0]
             if action_type == "accept":
-                o.status = "ODR_PL"
+                o.status = "ARR_PP"
                 o.save()
                 resp['status'] = 'success'
             elif action_type == "ass_driver":
@@ -56,7 +56,7 @@ class PartnerOrderAction(APIView):
                 if driver:
                     driver = driver[0]
                     o.driver = driver
-                    o.status = "ARR_PP"
+                    o.status = "DISPATCHED"
                     o.save()
                     resp['status'] = 'success'
         return Response(resp, status=200)
@@ -65,6 +65,76 @@ class PartnerOrderAction(APIView):
 class PartnerDriverAction(APIView):
     def post(self, request):
         resp = {'status': 'failed'}
+        driver_name = request.data.get('driver_name')
+        action_type = request.data.get('action_type')
+        driver = Driver.objects.filter(name=driver_name)
+        if driver:
+            driver = driver[0]
+            if action_type == "disable":
+                driver.status = "disable"
+                driver.save()
+                resp['status'] = 'success'
+        return Response(resp, status=200)
+
+
+class PartnerVehicalAction(APIView):
+    def post(self, request):
+        resp = {'status': 'failed'}
+        action_type = request.data.get('action_type')
+        reg_no = request.data.get('reg_no')
+        v = Vehicals.objects.filter(reg_no=reg_no)
+        if v:
+            v = v[0]
+            if action_type == "disable":
+                v.status = "disable"
+                v.save()
+                resp["status"] = "success"
+        return Response(resp, status=200)
+
+
+class DriverOrderManagement(APIView):
+    def post(self, request):
+        resp = {'status': 'failed'}
+        order_id = request.data.get('order_id')
+        o = Orders.objects.filter(order_id=order_id)
+        if o:
+            o = o[0]
+            o.driver.status = "active"
+            o.status = "DISPATCHED"
+            o.save()
+            o.driver.save()
+            resp['status'] = 'success'
+        return Response(resp, status=200)
+
+    def get(self, request):
+        resp = {'status': 'failed'}
+        driver_name = request.GET.get('driver_name')
+        driver = Driver.objects.filter(name=driver_name)
+        if driver:
+            resp['status'] = 'success'
+            resp['data'] = []
+            driver = driver[0]
+            orders = Orders.objects.filter(driver=driver)
+            for order in orders:
+                temp_data = {}
+                temp_data['status'] = 'success'
+                temp_data['order_id'] = order.order_id
+                temp_data['username'] = order.user.username
+                temp_data['p_type'] = order.product
+                temp_data['quantity'] = order.quantity
+                temp_data['rate'] = order.rate
+                temp_data['amount'] = order.amount
+                temp_data['status'] = order.status
+                temp_data['address'] = order.address
+                temp_data['latitude'] = order.latitude
+                temp_data['longitude'] = order.longitude
+                temp_data['created_at'] = order.created_at.date()
+                temp_data['channel_partner'] = order.channel_partner.name
+                temp_data['channel_partner_latitude'] = order.channel_partner.latitude
+                temp_data['channel_partner_longitude'] = order.channel_partner.longitude
+                temp_data['rating'] = order.rating
+                resp['data'].append(temp_data)
+        return Response(resp, status=200)
 
 
 class DriverManagement(APIView):
@@ -74,8 +144,10 @@ class DriverManagement(APIView):
         name = request.data.get('name')
         address = request.data.get('address')
         mobile = request.data.get('mobile')
+        vehical = Vehicals.objects.all().first()
         d = Driver(name=name, address=address,
-                   mobile=mobile, rating=5, status="online")
+                   mobile=mobile, rating=5, status="online",
+                   vehical=vehical)
         d.save()
         resp['status'] = 'success'
         return Response(resp, status=201)
