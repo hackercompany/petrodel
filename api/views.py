@@ -137,8 +137,9 @@ class DriverOrderManagement(APIView):
                 temp_data['amount'] = order.amount
                 temp_data['status'] = order.status
                 temp_data['address'] = order.address
-                temp_data['latitude'] = order.latitude
-                temp_data['longitude'] = order.longitude
+                temp_data['latitude'] = order.asset.latitude
+                temp_data['longitude'] = order.asset.longitude
+                temp_data['tag_id'] = order.asset.tag_id
                 temp_data['created_at'] = order.created_at.date()
                 temp_data['channel_partner'] = order.channel_partner.name
                 temp_data['channel_partner_latitude'] = order.channel_partner.latitude
@@ -232,9 +233,18 @@ class AssetManagement(APIView):
         if user:
             user = user[0]
             asset_name = request.data.get('assetname')
-            asset = UserAssets(user=user, name=asset_name)
-            asset.save()
-            resp['status'] = 'success'
+            latitude = request.data.get('latitude')
+            longitude = request.data.get('longitude')
+            sap_id = request.data.get('sap_id')
+            tag_id = request.data.get('tag_id')
+            asset = UserAssets(user=user, name=asset_name, latitude=latitude,
+                               longitude=longitude, sap_id=sap_id,
+                               tag_id=tag_id)
+            try:
+                asset.save()
+                resp['status'] = 'success'
+            except Exception:
+                resp['reason'] = 'Sap id already registred'
         return Response(resp, status=200)
 
     @csrf_exempt
@@ -306,20 +316,22 @@ class ChannelPartnerOrder(APIView):
         product_type = request.data.get('p_type')
         address = request.data.get('address')
         quantity = float(request.data.get('quantity', '0'))
-        latitude = request.data.get('latitude')
-        longitude = request.data.get('longitude')
+        sap_id = request.data.get('sap_id')
         rate = 79.72
         amount = quantity * rate
         status = 'ODR_PL'
         created_at = datetime.now()
         channel_partner = ChannelPartner.objects.all().first()
+        asset = UserAssets.objects.filter(sap_id=sap_id)
+        if not asset:
+            return Response(resp, status=200)
+        asset = asset[0]
         if amount > 0:
             order = Orders(product=product_type, quantity=quantity,
                            rate=rate, amount=amount, status=status,
                            channel_partner=channel_partner, user=user,
                            order_id=order_id, address=address,
-                           created_at=created_at, latitude=latitude,
-                           longitude=longitude)
+                           created_at=created_at, asset=asset)
             order.save()
             resp['status'] = 'success'
             resp['order_id'] = order_id
@@ -346,20 +358,22 @@ class OrderManagement(APIView):
         product_type = request.data.get('p_type')
         address = request.data.get('address')
         quantity = float(request.data.get('quantity', '0'))
-        latitude = request.data.get('latitude')
-        longitude = request.data.get('longitude')
+        sap_id = request.data.get('sap_id')
         rate = 79.72
         amount = quantity * rate
         status = 'ODR_PL'
         created_at = datetime.now()
         channel_partner = ChannelPartner.objects.all().first()
+        asset = UserAssets.objects.filter(sap_id=sap_id)
+        if not asset:
+            return Response(resp, status=200)
+        asset = asset[0]
         if amount > 0:
             order = Orders(product=product_type, quantity=quantity,
                            rate=rate, amount=amount, status=status,
                            channel_partner=channel_partner, user=user,
                            order_id=order_id, address=address,
-                           created_at=created_at, latitude=latitude,
-                           longitude=longitude)
+                           created_at=created_at, asset=asset)
             order.save()
             resp['status'] = 'success'
             resp['order_id'] = order_id
@@ -383,8 +397,9 @@ class OrderManagement(APIView):
             resp['amount'] = order.amount
             resp['status'] = order.status
             resp['address'] = order.address
-            resp['latitude'] = order.latitude
-            resp['longitude'] = order.longitude
+            resp['latitude'] = order.asset.latitude
+            resp['longitude'] = order.asset.longitude
+            resp['tag_id'] = order.asset.tag_id
             resp['created_at'] = order.created_at.date()
             resp['channel_partner'] = order.channel_partner.name
             resp['channel_partner_latitude'] = order.channel_partner.latitude
@@ -418,8 +433,9 @@ class UserOrders(APIView):
                 data['amount'] = order.amount
                 data['status'] = order.status
                 data['address'] = order.address
-                data['latitude'] = order.latitude
-                data['longitude'] = order.longitude
+                data['latitude'] = order.asset.latitude
+                data['longitude'] = order.asset.longitude
+                data['tag_id'] = order.asset.tag_id
                 data['created_at'] = order.created_at.date()
                 data['channel_partner'] = order.channel_partner.name
                 data['channel_partner_latitude'] = order.channel_partner.latitude

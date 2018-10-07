@@ -14,6 +14,10 @@ class Users(Document):
 class UserAssets(Document):
     user = ReferenceField(Users)
     name = StringField(max_length=200)
+    latitude = StringField(max_length=20)
+    longitude = StringField(max_length=20)
+    sap_id = StringField(max_length=12, unique=True)
+    tag_id = StringField(max_length=20)
 
 
 class ChannelPartner(Document):
@@ -55,6 +59,5 @@ class Orders(Document):
     address = StringField(max_length=200)
     channel_partner = ReferenceField(ChannelPartner)
     driver = ReferenceField(Driver)
-    latitude = StringField(max_length=20)
-    longitude = StringField(max_length=20)
     rating = IntField()
+    asset = ReferenceField(UserAssets)
