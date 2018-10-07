@@ -136,7 +136,7 @@ class DriverOrderManagement(APIView):
                 temp_data['rate'] = order.rate
                 temp_data['amount'] = order.amount
                 temp_data['status'] = order.status
-                temp_data['address'] = order.address
+                temp_data['address'] = order.asset.address
                 temp_data['latitude'] = order.asset.latitude
                 temp_data['longitude'] = order.asset.longitude
                 temp_data['tag_id'] = order.asset.tag_id
@@ -258,7 +258,12 @@ class AssetManagement(APIView):
             assets = UserAssets.objects.filter(user=user)
             for asset in assets:
                 temp_data = {
-                    'asset_name': asset.name
+                    'asset_name': asset.name,
+                    'sap_id': asset.sap_id,
+                    'address': asset.address,
+                    'tag_id': asset.tag_id,
+                    'latitude': asset.latitude,
+                    'longitude': asset.longitude
                 }
                 resp['data'].append(temp_data)
                 resp['status'] = 'success'
@@ -294,7 +299,7 @@ class ChannelPartnerOrder(APIView):
                 data['rate'] = order.rate
                 data['amount'] = order.amount
                 data['status'] = order.status
-                data['address'] = order.address
+                data['address'] = order.asset.address
                 data['created_at'] = order.created_at.date()
                 data['channel_partner'] = order.channel_partner.name
                 if order.driver:
@@ -314,7 +319,6 @@ class ChannelPartnerOrder(APIView):
         user = Users.objects.get(username=username)
         order_id = self.m.get_txn_id()
         product_type = request.data.get('p_type')
-        address = request.data.get('address')
         quantity = float(request.data.get('quantity', '0'))
         sap_id = request.data.get('sap_id')
         rate = 79.72
@@ -356,7 +360,6 @@ class OrderManagement(APIView):
         user = user[0]
         order_id = self.m.get_txn_id()
         product_type = request.data.get('p_type')
-        address = request.data.get('address')
         quantity = float(request.data.get('quantity', '0'))
         sap_id = request.data.get('sap_id')
         rate = 79.72
@@ -396,7 +399,7 @@ class OrderManagement(APIView):
             resp['rate'] = order.rate
             resp['amount'] = order.amount
             resp['status'] = order.status
-            resp['address'] = order.address
+            resp['address'] = order.asset.address
             resp['latitude'] = order.asset.latitude
             resp['longitude'] = order.asset.longitude
             resp['tag_id'] = order.asset.tag_id
@@ -432,7 +435,7 @@ class UserOrders(APIView):
                 data['rate'] = order.rate
                 data['amount'] = order.amount
                 data['status'] = order.status
-                data['address'] = order.address
+                data['address'] = order.asset.address
                 data['latitude'] = order.asset.latitude
                 data['longitude'] = order.asset.longitude
                 data['tag_id'] = order.asset.tag_id

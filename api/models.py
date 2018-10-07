@@ -18,6 +18,7 @@ class UserAssets(Document):
     longitude = StringField(max_length=20)
     sap_id = StringField(max_length=12, unique=True)
     tag_id = StringField(max_length=20)
+    address = StringField(max_length=200)
 
 
 class ChannelPartner(Document):
@@ -56,7 +57,6 @@ class Orders(Document):
     rate = FloatField()
     amount = FloatField()
     status = StringField(max_length=50)
-    address = StringField(max_length=200)
     channel_partner = ReferenceField(ChannelPartner)
     driver = ReferenceField(Driver)
     rating = IntField()
