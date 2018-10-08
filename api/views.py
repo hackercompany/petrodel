@@ -375,8 +375,8 @@ class OrderManagement(APIView):
             order = Orders(product=product_type, quantity=quantity,
                            rate=rate, amount=amount, status=status,
                            channel_partner=channel_partner, user=user,
-                           order_id=order_id, address=address,
-                           created_at=created_at, asset=asset)
+                           order_id=order_id, created_at=created_at,
+                           asset=asset)
             order.save()
             resp['status'] = 'success'
             resp['order_id'] = order_id
