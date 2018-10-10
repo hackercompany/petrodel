@@ -153,6 +153,7 @@ class DriverOrderManagement(APIView):
                 temp_data['status'] = 'success'
                 temp_data['order_id'] = order.order_id
                 temp_data['username'] = order.user.username
+                temp_data['name'] = order.user.name
                 temp_data['p_type'] = order.product
                 temp_data['quantity'] = order.quantity
                 temp_data['rate'] = order.rate
