@@ -52,12 +52,16 @@ class Register(APIView):
         resp = {'status': 'failed'}
         u = Users.objects.all()
         resp['data'] = []
+        resp['meta'] = {'total_order': 0, 'total_users': 0, 'total_assets': 0}
         for user in u:
             temp_data = {}
             temp_data['name'] = user.name
             temp_data['username'] = user.username
             temp_data['assets'] = UserAssets.objects.filter(user=user).count()
             temp_data['orders'] = Orders.objects.filter(user=user).count()
+            resp['meta']['total_order'] += temp_data['orders']
+            resp['meta']['total_users'] += 1
+            resp['meta']['total_assets'] += temp_data['assets']
             resp['data'].append(temp_data)
             resp['status'] = 'success'
         return Response(resp, status=200)
