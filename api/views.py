@@ -47,6 +47,21 @@ class Register(APIView):
         resp['status'] = 'success'
         return Response(resp, status=200)
 
+    @csrf_exempt
+    def get(self, request):
+        resp = {'status': 'failed'}
+        u = Users.objects.all()
+        resp['data'] = []
+        for user in u:
+            temp_data = {}
+            temp_data['name'] = user.name
+            temp_data['username'] = user.username
+            temp_data['assets'] = UserAssets.objects.filter(user=user).count()
+            temp_data['orders'] = Orders.objects.filter(user=user).count()
+            resp['data'].append(temp_data)
+            resp['status'] = 'success'
+        return Response(resp, status=200)
+
 
 class PartnerOrderAction(APIView):
     @csrf_exempt
