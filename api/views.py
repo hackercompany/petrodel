@@ -417,6 +417,7 @@ class OrderManagement(APIView):
             order = order[0]
             resp['order_id'] = order_id
             resp['username'] = order.user.username
+            resp['name'] = order.user.name
             resp['p_type'] = order.product
             resp['quantity'] = order.quantity
             resp['rate'] = order.rate
@@ -453,6 +454,7 @@ class UserOrders(APIView):
                 data = {}
                 data['order_id'] = order.order_id
                 data['username'] = order.user.username
+                data['name'] = order.user.name
                 data['p_type'] = order.product
                 data['quantity'] = order.quantity
                 data['rate'] = order.rate
