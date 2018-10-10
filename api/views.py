@@ -58,7 +58,7 @@ class PartnerOrderAction(APIView):
         if o:
             o = o[0]
             if action_type == "accept":
-                o.status = "ARR_PP"
+                o.status = "ACCEPTED"
                 o.save()
                 resp['status'] = 'success'
             elif action_type == "ass_driver":
@@ -67,7 +67,7 @@ class PartnerOrderAction(APIView):
                 if driver:
                     driver = driver[0]
                     o.driver = driver
-                    o.status = "DISPATCHED"
+                    o.status = "DRVR_ASS"
                     o.save()
                     resp['status'] = 'success'
         return Response(resp, status=200)
@@ -103,18 +103,40 @@ class PartnerVehicalAction(APIView):
         return Response(resp, status=200)
 
 
+class Rating(APIView):
+    def post(self, request):
+        resp = {'status': 'failed'}
+        order_id = request.data.get('order_id')
+        rating = request.data.get('rating')
+        o = Orders.objects.filter(order_id=order_id)
+        if o:
+            o = o[0]
+            o.rating = float(rating)
+            resp['status'] = 'success'
+            o.save()
+        return Response(resp, status=200)
+
+
 class DriverOrderManagement(APIView):
     def post(self, request):
         resp = {'status': 'failed'}
         order_id = request.data.get('order_id')
+        action_type = request.data.get('action_type')
         o = Orders.objects.filter(order_id=order_id)
         if o:
             o = o[0]
             o.driver.status = "active"
-            o.status = "DISPATCHED"
+            if action_type == "onway":
+                o.status = "DISPATCHED"
+            elif action_type == "accept":
+                o.status = "ARR_PP"
+            elif action_type == "reject":
+                o.status = "REJECTED"
+            elif action_type == "delivered":
+                o.status = "DELIVERED"
+            resp['status'] = 'success'
             o.save()
             o.driver.save()
-            resp['status'] = 'success'
         return Response(resp, status=200)
 
     def get(self, request):
@@ -237,9 +259,10 @@ class AssetManagement(APIView):
             longitude = request.data.get('longitude')
             sap_id = request.data.get('sap_id')
             tag_id = request.data.get('tag_id')
+            address = request.data.get('address')
             asset = UserAssets(user=user, name=asset_name, latitude=latitude,
                                longitude=longitude, sap_id=sap_id,
-                               tag_id=tag_id)
+                               tag_id=tag_id, address=address)
             try:
                 asset.save()
                 resp['status'] = 'success'
