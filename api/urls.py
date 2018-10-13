@@ -14,6 +14,8 @@ urlpatterns = [
     url(r'^user/order', views.UserOrders.as_view()),
     url(r'^user/rating', views.Rating.as_view()),
     url(r'^driver/order', views.DriverOrderManagement.as_view()),
+    url(r'^driver/login', views.DriverLogin.as_view()),
+    url(r'^driver/logout', views.DriverLogout.as_view()),
     url(r'^driver/', views.DriverManagement.as_view()),
     url(r'^order/', views.OrderManagement.as_view()),
     url(r'^vehical/', views.VehicleManagement.as_view()),

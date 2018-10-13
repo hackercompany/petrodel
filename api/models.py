@@ -46,6 +46,7 @@ class Driver(Document):
     vehical = ReferenceField(Vehicals)
     latitude = StringField(max_length=20)
     longitude = StringField(max_length=20)
+    password = StringField(max_length=100)
 
 
 class Orders(Document):

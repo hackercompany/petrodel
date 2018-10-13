@@ -68,8 +68,12 @@ class Register(APIView):
 
 
 class PartnerOrderAction(APIView):
+    def __init__(self):
+        self.m = Methods()
+
     @csrf_exempt
     def post(self, request):
+        client = self.m.get_redis_client()
         resp = {'status': 'failed'}
         action_type = request.data.get('action_type')
         order_id = request.data.get('order_id')
@@ -81,10 +85,9 @@ class PartnerOrderAction(APIView):
                 o.save()
                 resp['status'] = 'success'
             elif action_type == "ass_driver":
-                driver_name = request.data.get('driver_name')
-                driver = Driver.objects.filter(name=driver_name)
-                if driver:
-                    driver = driver[0]
+                driver_id = client.get('driveronline')
+                if driver_id:
+                    driver = Driver.objects.get(id=driver_id)
                     o.driver = driver
                     o.status = "DRVR_ASS"
                     o.save()
@@ -198,10 +201,13 @@ class DriverManagement(APIView):
         name = request.data.get('name')
         address = request.data.get('address')
         mobile = request.data.get('mobile')
+        password = request.data.get('password')
+        if not password:
+            password = 'relpetrodel'
         vehical = Vehicals.objects.all().first()
         d = Driver(name=name, address=address,
                    mobile=mobile, rating=5, status="online",
-                   vehical=vehical)
+                   vehical=vehical, password=password)
         d.save()
         resp['status'] = 'success'
         return Response(resp, status=200)
@@ -220,6 +226,35 @@ class DriverManagement(APIView):
             if driver.vehical:
                 temp_data['reg_no'] = driver.vehical.reg_no
             resp['data'].append(temp_data)
+        return Response(resp, status=200)
+
+
+class DriverLogin(APIView):
+    def __init__(self):
+        self.m = Methods()
+
+    def post(self, request):
+        resp = {'status': 'failed'}
+        mobile = request.data.get('mobile')
+        password = request.data.get('password')
+        driver = Driver.objects.filter(mobile=mobile, password=password)
+        if driver:
+            client = self.m.get_redis_client()
+            client.set('driveronline', driver[0].id)
+            resp['status'] = 'success'
+        return Response(resp, status=200)
+
+
+class DriverLogout(APIView):
+    def __init__(self):
+        self.m = Methods()
+
+    def post(self, request):
+        resp = {'status': 'failed'}
+        mobile = request.data.get('mobile')
+        client = self.m.get_redis_client()
+        client.delete('driveronline')
+        resp['status'] = 'success'
         return Response(resp, status=200)
 
 
