@@ -242,6 +242,7 @@ class DriverLogin(APIView):
             client = self.m.get_redis_client()
             client.set('driveronline', driver[0].id)
             resp['status'] = 'success'
+            resp['driver_name'] = driver[0].name
         return Response(resp, status=200)
 
 
