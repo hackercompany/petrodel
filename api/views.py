@@ -350,6 +350,16 @@ class AssetManagement(APIView):
                 resp['status'] = 'success'
         return Response(resp, status=200)
 
+    def delete(self, request):
+        resp = {"status": "failed"}
+        sap_id = request.data.get('sap_id')
+        asset = UserAssets.objects.filter(sap_id=sap_id)
+        if asset:
+            asset = asset[0]
+            asset.delete()
+            resp['status'] = 'success'
+        return Response(resp)
+
 
 class ChannelPartnerOrder(APIView):
     def __init__(self):
