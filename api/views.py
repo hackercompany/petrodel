@@ -316,9 +316,11 @@ class AssetManagement(APIView):
             sap_id = request.data.get('sap_id')
             tag_id = request.data.get('tag_id')
             address = request.data.get('address')
+            capacity = request.data.get('capacity')
             asset = UserAssets(user=user, name=asset_name, latitude=latitude,
                                longitude=longitude, sap_id=sap_id,
-                               tag_id=tag_id, address=address)
+                               tag_id=tag_id, address=address,
+                               capacity=capacity)
             try:
                 asset.save()
                 resp['status'] = 'success'

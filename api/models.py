@@ -19,6 +19,7 @@ class UserAssets(Document):
     sap_id = StringField(max_length=12, unique=True)
     tag_id = StringField(max_length=20)
     address = StringField(max_length=200)
+    capacity = StringField(max_length=20)
 
 
 class ChannelPartner(Document):
