@@ -344,7 +344,8 @@ class AssetManagement(APIView):
                     'address': asset.address,
                     'tag_id': asset.tag_id,
                     'latitude': asset.latitude,
-                    'longitude': asset.longitude
+                    'longitude': asset.longitude,
+                    'capacity': asset.capacity
                 }
                 resp['data'].append(temp_data)
                 resp['status'] = 'success'
