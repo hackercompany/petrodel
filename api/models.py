@@ -20,6 +20,7 @@ class UserAssets(Document):
     tag_id = StringField(max_length=20)
     address = StringField(max_length=200)
     capacity = IntField()
+    status = StringField(max_length=20)
 
 
 class ChannelPartner(Document):

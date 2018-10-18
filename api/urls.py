@@ -19,5 +19,6 @@ urlpatterns = [
     url(r'^driver/', views.DriverManagement.as_view()),
     url(r'^order/', views.OrderManagement.as_view()),
     url(r'^vehical/', views.VehicleManagement.as_view()),
+    url(r'^asset/delete', views.AssetDelete.as_view()),
     url(r'^asset/', views.AssetManagement.as_view()),
 ]

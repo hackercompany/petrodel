@@ -320,7 +320,7 @@ class AssetManagement(APIView):
             asset = UserAssets(user=user, name=asset_name, latitude=latitude,
                                longitude=longitude, sap_id=sap_id,
                                tag_id=tag_id, address=address,
-                               capacity=capacity)
+                               capacity=capacity, status="active")
             try:
                 asset.save()
                 resp['status'] = 'success'
@@ -336,7 +336,7 @@ class AssetManagement(APIView):
         if user:
             resp['data'] = []
             user = user[0]
-            assets = UserAssets.objects.filter(user=user)
+            assets = UserAssets.objects.filter(user=user, status="active")
             for asset in assets:
                 temp_data = {
                     'asset_name': asset.name,
@@ -351,13 +351,16 @@ class AssetManagement(APIView):
                 resp['status'] = 'success'
         return Response(resp, status=200)
 
-    def delete(self, request):
+
+class AssetDelete(APIView):
+    def post(self, request):
         resp = {"status": "failed"}
         sap_id = request.data.get('sap_id')
         asset = UserAssets.objects.filter(sap_id=sap_id)
         if asset:
             asset = asset[0]
-            asset.delete()
+            asset.status = "inactive"
+            asset.save()
             resp['status'] = 'success'
         return Response(resp)
 
