@@ -95,6 +95,24 @@ class PartnerOrderAction(APIView):
         return Response(resp, status=200)
 
 
+class AutoAssignDriver(APIView):
+    def __init__(self):
+        self.m = Methods()
+
+    def get(self, request):
+        client = self.m.get_redis_client()
+        curr_time = datetime.now().strftime("%Y-%m-%d %H:%M")
+        orders = Orders.objects.filter(scheduled=curr_time)
+        driver_id = client.get('driveronline')
+        if driver_id:
+            for o in orders:
+                driver = Driver.objects.get(id=driver_id)
+                o.driver = driver
+                o.status = "DRVR_ASS"
+                o.save()
+        return Response({"key": "value"})
+
+
 class PartnerDriverAction(APIView):
     def post(self, request):
         resp = {'status': 'failed'}
@@ -460,6 +478,7 @@ class OrderManagement(APIView):
         rate = 79.72
         amount = quantity * rate
         status = 'ODR_PL'
+        scheduled = request.data.get('scheduled')
         created_at = datetime.now()
         channel_partner = ChannelPartner.objects.all().first()
         asset = UserAssets.objects.filter(sap_id=sap_id)
@@ -471,7 +490,7 @@ class OrderManagement(APIView):
                            rate=rate, amount=amount, status=status,
                            channel_partner=channel_partner, user=user,
                            order_id=order_id, created_at=created_at,
-                           asset=asset)
+                           asset=asset, scheduled=scheduled)
             order.save()
             resp['status'] = 'success'
             resp['order_id'] = order_id
@@ -495,6 +514,7 @@ class OrderManagement(APIView):
             resp['rate'] = order.rate
             resp['amount'] = order.amount
             resp['status'] = order.status
+            resp['scheduled'] = order.scheduled
             resp['address'] = order.asset.address
             resp['latitude'] = order.asset.latitude
             resp['longitude'] = order.asset.longitude
@@ -532,6 +552,7 @@ class UserOrders(APIView):
                 data['rate'] = order.rate
                 data['amount'] = order.amount
                 data['status'] = order.status
+                data['scheduled'] = order.scheduled
                 data['address'] = order.asset.address
                 data['latitude'] = order.asset.latitude
                 data['longitude'] = order.asset.longitude

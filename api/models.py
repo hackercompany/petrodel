@@ -64,3 +64,4 @@ class Orders(Document):
     driver = ReferenceField(Driver)
     rating = IntField()
     asset = ReferenceField(UserAssets)
+    scheduled = StringField(max_length=30)
