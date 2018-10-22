@@ -28,6 +28,21 @@ class ChannelPartnerRegistration(APIView):
         resp['status'] = 'success'
         return Response(resp, status=200)
 
+    def get(self, request):
+        resp = {'status': 'failed'}
+        partners = ChannelPartner.objects.all()
+        resp['data'] = []
+        for partner in partners:
+            temp_data = {}
+            temp_data['user'] = partner.user
+            temp_data['name'] = partner.name
+            temp_data['address'] = partner.address
+            temp_data['latitude'] = partner.latitude
+            temp_data['longitude'] = partner.longitude
+            resp['data'].append(temp_data)
+            resp['status'] = 'success'
+        return Response(resp, status=200)
+
 
 class UserLogin(APIView):
     def post(self, request):
@@ -42,6 +57,8 @@ class UserLogin(APIView):
 
 class Invoice(APIView):
     def get(self, request):
+        order_id = request.GET.get('order_id')
+
         template = get_template(
             settings.BASE_DIR + "/static/html/invoice.html")
         html = template.render()
