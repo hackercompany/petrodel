@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^asset/delete', views.AssetDelete.as_view()),
     url(r'^asset/', views.AssetManagement.as_view()),
     url(r'^schedule/', views.AutoAssignDriver.as_view()),
+    url(r'^invoice/', views.Invoice.as_view()),
 ]

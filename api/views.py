@@ -1,9 +1,14 @@
+import xhtml2pdf.pisa as pisa
+from io import BytesIO
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from models import *
 from methods import Methods
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
+from django.template.loader import get_template
+from django.http import HttpResponse
+from django.conf import settings
 
 # Create your views here.
 
@@ -33,6 +38,20 @@ class UserLogin(APIView):
         if user:
             resp['status'] = 'success'
         return Response(resp, status=200)
+
+
+class Invoice(APIView):
+    def get(self, request):
+        template = get_template(
+            settings.BASE_DIR + "/static/html/invoice.html")
+        html = template.render()
+        response = BytesIO()
+        pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), response)
+        if not pdf.err:
+            return HttpResponse(response.getvalue(),
+                                content_type='application/pdf')
+        else:
+            return HttpResponse("Error Rendering PDF", status=400)
 
 
 class Register(APIView):
