@@ -58,17 +58,32 @@ class UserLogin(APIView):
 class Invoice(APIView):
     def get(self, request):
         order_id = request.GET.get('order_id')
-
-        template = get_template(
-            settings.BASE_DIR + "/static/html/invoice.html")
-        html = template.render()
-        response = BytesIO()
-        pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), response)
-        if not pdf.err:
-            return HttpResponse(response.getvalue(),
-                                content_type='application/pdf')
-        else:
-            return HttpResponse("Error Rendering PDF", status=400)
+        order = Orders.objects.filter(order_id=order_id)
+        if order:
+            order = order[0]
+            params = {}
+            params['name'] = order.user.username
+            params['address'] = order.asset.address
+            params['asset_name'] = order.asset.name
+            params['product'] = order.product
+            params['fuel_rate'] = order.rate
+            params['quantity'] = order.quantity
+            params['amount'] = order.amount
+            params['sap_id'] = order.asset.sap_id
+            params['status'] = order.status
+            params['channel_partner'] = order.channel_partner.name
+            params['driver'] = order.driver.name
+            template = get_template(
+                settings.BASE_DIR + "/static/html/invoice.html")
+            html = template.render(params)
+            response = BytesIO()
+            pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), response)
+            if not pdf.err:
+                return HttpResponse(response.getvalue(),
+                                    content_type='application/pdf')
+            else:
+                return HttpResponse("Error Rendering PDF", status=200)
+        return HttpResponse("Order Not Found", status=200)
 
 
 class Register(APIView):
